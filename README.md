@@ -17,6 +17,12 @@ For web:
 npm run web
 ```
 
+For a browser-safe local web build that does not try to auto-open DevTools:
+
+```bash
+npm run web:headless
+```
+
 For tests:
 
 ```bash

@@ -1,5 +1,5 @@
 {
-  "name": "choco",
+  "name": "dark-diary",
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
@@ -7,6 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "web:headless": "node scripts/run-web-static.js",
     "eas:configure": "npx eas-cli build:configure",
     "eas:build:android": "npx eas-cli build --platform android --profile production",
     "eas:build:ios": "npx eas-cli build --platform ios --profile production",

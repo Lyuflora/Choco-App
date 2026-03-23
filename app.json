@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "ChocoCare",
-    "slug": "chococare",
-    "scheme": "chococare",
+    "name": "Dark Diary",
+    "slug": "dark-diary",
+    "scheme": "darkdiary",
     "version": "1.0.0",
     "description": "A personal chocolate diary for tracking eating, tasting, purchases, calories, and monthly spending.",
     "orientation": "portrait",
@@ -17,7 +17,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.alyu.chococare",
+      "bundleIdentifier": "com.alyu.darkdiary",
       "buildNumber": "1",
       "requireFullScreen": false,
       "config": {
@@ -25,7 +25,7 @@
       }
     },
     "android": {
-      "package": "com.alyu.chococare",
+      "package": "com.alyu.darkdiary",
       "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#F6F2EE",
