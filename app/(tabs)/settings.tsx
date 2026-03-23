@@ -1,9 +1,11 @@
+// Settings holds the few personal preferences that shape budget, calorie, and display defaults across the whole app.
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { useEffect, useState } from "react";
+import { SegmentedControl } from "../../src/components/SegmentedControl";
+import { EmptyState } from "../../src/components/ui/EmptyState";
 import { FormField } from "../../src/components/ui/FormField";
 import { PrimaryButton } from "../../src/components/ui/PrimaryButton";
 import { ScreenShell } from "../../src/components/ui/ScreenShell";
-import { SegmentedControl } from "../../src/components/SegmentedControl";
 import { defaultSettings } from "../../src/data/seed";
 import { useDarkDiary } from "../../src/store/app-provider";
 import { parseOptionalNumber } from "../../src/utils/validation";
@@ -49,7 +51,7 @@ export default function SettingsScreen() {
   if (isHydrating) {
     return (
       <ScreenShell title="Settings" subtitle="Loading local preferences...">
-        <Text>Loading...</Text>
+        <EmptyState title="Loading settings" description="Your budget, calorie, and display preferences are loading." />
       </ScreenShell>
     );
   }

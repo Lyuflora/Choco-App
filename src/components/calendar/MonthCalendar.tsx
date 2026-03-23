@@ -1,3 +1,4 @@
+// MonthCalendar renders the day grid so the Calendar screen only needs to supply data and selection behavior.
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { CALENDAR_WEEKDAYS } from "../../utils/date";
 import type { CalendarCell } from "../../types/models";
@@ -103,4 +104,3 @@ const styles = StyleSheet.create({
     color: palette.textMuted,
   },
 });
-

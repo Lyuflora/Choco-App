@@ -1,3 +1,4 @@
+// Seed data gives the app a believable starting state so the UI is testable before a real user logs anything.
 import { addDays, nowIso, toDateKey } from "../utils/date";
 import type { AppSettings, Chocolate, DarkDiaryStore, Entry } from "../types/models";
 
@@ -146,4 +147,3 @@ export function createSeedStore(): DarkDiaryStore {
     settings: defaultSettings,
   };
 }
-

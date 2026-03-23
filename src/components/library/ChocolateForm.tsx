@@ -1,3 +1,4 @@
+// ChocolateForm centralizes the long library form so create and edit screens stay nearly identical and easier to maintain.
 import { StyleSheet, Text, View } from "react-native";
 import { SegmentedControl } from "../SegmentedControl";
 import { FormField } from "../ui/FormField";
@@ -163,4 +164,3 @@ const styles = StyleSheet.create({
     color: palette.textMuted,
   },
 });
-

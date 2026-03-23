@@ -1,3 +1,4 @@
+// SelectionField provides a simple bottom-sheet picker for choosing one item from a saved list, like chocolates from the library.
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { palette, radii, spacing } from "../../ui/theme";
 
@@ -122,4 +123,3 @@ const styles = StyleSheet.create({
     color: palette.textMuted,
   },
 });
-

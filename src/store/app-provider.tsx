@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+// The provider is the app's single local data source so screens can stay focused on UI instead of persistence details.
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { createSeedStore, defaultSettings } from "../data/seed";
 import { loadStore, saveStore } from "../storage/local-store";
 import type {
@@ -30,6 +31,8 @@ interface DarkDiaryContextValue {
   getMonthSummary: (anchor: Date) => MonthSummary;
   resetWithSeedData: () => Promise<void>;
 }
+
+type ChocolateFlag = "favorite" | "buyAgain";
 
 const DarkDiaryContext = createContext<DarkDiaryContextValue | null>(null);
 
@@ -63,8 +66,75 @@ export function createEmptyChocolateDraft(): ChocolateDraft {
   };
 }
 
+function createInitialStore(): DarkDiaryStore {
+  return {
+    chocolates: [],
+    entries: [],
+    settings: defaultSettings,
+  };
+}
+
 function createId(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function buildEntry(date: string, draft: EntryDraft): Entry {
+  const timestamp = nowIso();
+
+  return {
+    id: createId("entry"),
+    date,
+    actionType: draft.actionType,
+    chocolateId: draft.chocolateId,
+    bars: draft.bars,
+    grams: draft.grams,
+    calories: draft.calories,
+    spend: draft.spend,
+    note: draft.note.trim(),
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+}
+
+function withoutNoChocolateMarker(entries: Entry[], date: string): Entry[] {
+  return entries.filter((entry) => !(entry.date === date && entry.actionType === "no_chocolate"));
+}
+
+function buildChocolate(draft: ChocolateDraft, chocolateId?: string, existing?: Chocolate): Chocolate {
+  const timestamp = nowIso();
+
+  return {
+    id: chocolateId ?? createId("chocolate"),
+    brand: draft.brand.trim(),
+    productName: draft.productName.trim(),
+    category: draft.category.trim(),
+    cacaoPercent: draft.cacaoPercent,
+    originCountry: draft.originCountry.trim(),
+    flavorNotes: parseListText(draft.flavorNotesText),
+    ingredients: parseListText(draft.ingredientsText),
+    packageSizeGrams: draft.packageSizeGrams,
+    defaultCalories: draft.defaultCalories,
+    defaultPrice: draft.defaultPrice,
+    rating: draft.rating,
+    favorite: draft.favorite,
+    buyAgain: draft.buyAgain,
+    createdAt: existing?.createdAt ?? timestamp,
+    updatedAt: timestamp,
+  };
+}
+
+function toggleChocolateFlag(chocolates: Chocolate[], chocolateId: string, field: ChocolateFlag): Chocolate[] {
+  const timestamp = nowIso();
+
+  return chocolates.map((chocolate) =>
+    chocolate.id === chocolateId
+      ? {
+          ...chocolate,
+          [field]: !chocolate[field],
+          updatedAt: timestamp,
+        }
+      : chocolate,
+  );
 }
 
 export function toChocolateDraft(chocolate?: Chocolate): ChocolateDraft {
@@ -89,12 +159,8 @@ export function toChocolateDraft(chocolate?: Chocolate): ChocolateDraft {
   };
 }
 
-export function DarkDiaryProvider({ children }: { children: React.ReactNode }) {
-  const [store, setStore] = useState<DarkDiaryStore>({
-    chocolates: [],
-    entries: [],
-    settings: defaultSettings,
-  });
+export function DarkDiaryProvider({ children }: { children: ReactNode }) {
+  const [store, setStore] = useState<DarkDiaryStore>(createInitialStore);
   const [isHydrating, setIsHydrating] = useState(true);
   const storeRef = useRef(store);
 
@@ -103,14 +169,29 @@ export function DarkDiaryProvider({ children }: { children: React.ReactNode }) {
   }, [store]);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function hydrate() {
-      const nextStore = await loadStore();
-      setStore(nextStore);
-      storeRef.current = nextStore;
-      setIsHydrating(false);
+      try {
+        const nextStore = await loadStore();
+        if (!isMounted) {
+          return;
+        }
+
+        setStore(nextStore);
+        storeRef.current = nextStore;
+      } finally {
+        if (isMounted) {
+          setIsHydrating(false);
+        }
+      }
     }
 
     hydrate();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   async function commit(nextStore: DarkDiaryStore) {
@@ -121,37 +202,18 @@ export function DarkDiaryProvider({ children }: { children: React.ReactNode }) {
 
   async function saveEntry(date: string, draft: EntryDraft) {
     const current = storeRef.current;
-    const dateEntries = current.entries.filter((entry) => entry.date === date);
-    validateEntryDraft(draft, dateEntries);
-
-    const timestamp = nowIso();
-    const nextEntry: Entry = {
-      id: createId("entry"),
-      date,
-      actionType: draft.actionType,
-      chocolateId: draft.chocolateId,
-      bars: draft.bars,
-      grams: draft.grams,
-      calories: draft.calories,
-      spend: draft.spend,
-      note: draft.note.trim(),
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    };
-
-    const nextEntries =
-      draft.actionType === "no_chocolate"
-        ? current.entries.filter((entry) => !(entry.date === date && entry.actionType === "no_chocolate"))
-        : current.entries.filter((entry) => !(entry.date === date && entry.actionType === "no_chocolate"));
+    const existingEntriesForDate = current.entries.filter((entry) => entry.date === date);
+    validateEntryDraft(draft, existingEntriesForDate);
 
     await commit({
       ...current,
-      entries: [...nextEntries, nextEntry],
+      entries: [...withoutNoChocolateMarker(current.entries, date), buildEntry(date, draft)],
     });
   }
 
   async function deleteEntry(entryId: string) {
     const current = storeRef.current;
+
     await commit({
       ...current,
       entries: current.entries.filter((entry) => entry.id !== entryId),
@@ -161,35 +223,8 @@ export function DarkDiaryProvider({ children }: { children: React.ReactNode }) {
   async function saveChocolate(draft: ChocolateDraft, chocolateId?: string) {
     validateChocolateDraft(draft);
     const current = storeRef.current;
-    const timestamp = nowIso();
-
-    const baseChocolate: Chocolate = {
-      id: chocolateId ?? createId("chocolate"),
-      brand: draft.brand.trim(),
-      productName: draft.productName.trim(),
-      category: draft.category.trim(),
-      cacaoPercent: draft.cacaoPercent,
-      originCountry: draft.originCountry.trim(),
-      flavorNotes: parseListText(draft.flavorNotesText),
-      ingredients: parseListText(draft.ingredientsText),
-      packageSizeGrams: draft.packageSizeGrams,
-      defaultCalories: draft.defaultCalories,
-      defaultPrice: draft.defaultPrice,
-      rating: draft.rating,
-      favorite: draft.favorite,
-      buyAgain: draft.buyAgain,
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    };
-
-    const existing = current.chocolates.find((item) => item.id === baseChocolate.id);
-    const nextChocolate = existing
-      ? {
-          ...baseChocolate,
-          createdAt: existing.createdAt,
-        }
-      : baseChocolate;
-
+    const existing = current.chocolates.find((item) => item.id === chocolateId);
+    const nextChocolate = buildChocolate(draft, chocolateId, existing);
     const nextChocolates = existing
       ? current.chocolates.map((item) => (item.id === nextChocolate.id ? nextChocolate : item))
       : [nextChocolate, ...current.chocolates];
@@ -204,55 +239,44 @@ export function DarkDiaryProvider({ children }: { children: React.ReactNode }) {
 
   async function deleteChocolate(chocolateId: string) {
     const current = storeRef.current;
+    const timestamp = nowIso();
+
     await commit({
+      ...current,
       chocolates: current.chocolates.filter((chocolate) => chocolate.id !== chocolateId),
       entries: current.entries.map((entry) =>
         entry.chocolateId === chocolateId
           ? {
               ...entry,
               chocolateId: null,
-              updatedAt: nowIso(),
+              updatedAt: timestamp,
             }
           : entry,
       ),
-      settings: current.settings,
     });
   }
 
   async function toggleFavorite(chocolateId: string) {
     const current = storeRef.current;
+
     await commit({
       ...current,
-      chocolates: current.chocolates.map((chocolate) =>
-        chocolate.id === chocolateId
-          ? {
-              ...chocolate,
-              favorite: !chocolate.favorite,
-              updatedAt: nowIso(),
-            }
-          : chocolate,
-      ),
+      chocolates: toggleChocolateFlag(current.chocolates, chocolateId, "favorite"),
     });
   }
 
   async function toggleBuyAgain(chocolateId: string) {
     const current = storeRef.current;
+
     await commit({
       ...current,
-      chocolates: current.chocolates.map((chocolate) =>
-        chocolate.id === chocolateId
-          ? {
-              ...chocolate,
-              buyAgain: !chocolate.buyAgain,
-              updatedAt: nowIso(),
-            }
-          : chocolate,
-      ),
+      chocolates: toggleChocolateFlag(current.chocolates, chocolateId, "buyAgain"),
     });
   }
 
   async function updateSettings(nextSettings: AppSettings) {
     const current = storeRef.current;
+
     await commit({
       ...current,
       settings: nextSettings,
@@ -263,6 +287,7 @@ export function DarkDiaryProvider({ children }: { children: React.ReactNode }) {
     if (!chocolateId) {
       return undefined;
     }
+
     return store.chocolates.find((chocolate) => chocolate.id === chocolateId);
   }
 
@@ -275,8 +300,7 @@ export function DarkDiaryProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function resetWithSeedData() {
-    const nextStore = createSeedStore();
-    await commit(nextStore);
+    await commit(createSeedStore());
   }
 
   return (
@@ -304,9 +328,11 @@ export function DarkDiaryProvider({ children }: { children: React.ReactNode }) {
 
 export function useDarkDiary() {
   const context = useContext(DarkDiaryContext);
+
   if (!context) {
     throw new Error("useDarkDiary must be used within a DarkDiaryProvider.");
   }
+
   return context;
 }
 
@@ -314,4 +340,3 @@ export function useChocolateName(chocolateId: string | null) {
   const { store } = useDarkDiary();
   return chocolateNameById(store.chocolates, chocolateId);
 }
-

@@ -1,3 +1,4 @@
+// Summary helpers turn raw entries into daily and monthly rollups so screens can stay mostly presentational.
 import { calendarBounds, eachDay, isSameMonth, monthBounds, parseDateKey, todayDateKey, toDateKey } from "./date";
 import type { CalendarCell, Chocolate, DateSummary, Entry, MonthSummary } from "../types/models";
 
@@ -132,4 +133,3 @@ function sumValues(entries: Entry[], key: "bars" | "grams" | "calories" | "spend
   const value = entries.reduce((sum, entry) => sum + (entry[key] ?? 0), 0);
   return Number(value.toFixed(2));
 }
-

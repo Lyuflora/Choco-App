@@ -1,3 +1,4 @@
+// Local storage keeps the MVP offline-friendly by storing everything in one persisted document on the device.
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createSeedStore, defaultSettings } from "../data/seed";
 import type { DarkDiaryStore } from "../types/models";
@@ -14,19 +15,23 @@ function normalizeStore(value: Partial<DarkDiaryStore> | null): DarkDiaryStore {
 
 // The MVP keeps all app data in one document so hydration and persistence stay easy to follow.
 export async function loadStore(): Promise<DarkDiaryStore> {
-  const raw = await AsyncStorage.getItem(STORAGE_KEY);
+  try {
+    const raw = await AsyncStorage.getItem(STORAGE_KEY);
 
-  if (!raw) {
-    const seededStore = createSeedStore();
-    await saveStore(seededStore);
-    return seededStore;
+    if (!raw) {
+      const seededStore = createSeedStore();
+      await saveStore(seededStore);
+      return seededStore;
+    }
+
+    const parsed = JSON.parse(raw) as Partial<DarkDiaryStore>;
+    return normalizeStore(parsed);
+  } catch (error) {
+    console.warn("Dark Diary could not load local storage.", error);
+    return normalizeStore(null);
   }
-
-  const parsed = JSON.parse(raw) as Partial<DarkDiaryStore>;
-  return normalizeStore(parsed);
 }
 
 export async function saveStore(store: DarkDiaryStore): Promise<void> {
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(store));
 }
-

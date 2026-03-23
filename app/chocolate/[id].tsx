@@ -1,3 +1,4 @@
+// Edit chocolate updates or removes a saved library item while reusing the same form as the create flow.
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import { parseOptionalNumber } from "../../src/utils/validation";
 
 function emptyValues(): ChocolateFormValues {
   const draft = createEmptyChocolateDraft();
+
   return {
     brand: draft.brand,
     productName: draft.productName,
@@ -99,6 +101,33 @@ export default function EditChocolateScreen() {
       return;
     }
 
+    const shouldDelete = await new Promise<boolean>((resolve) => {
+      Alert.alert(
+        "Delete chocolate?",
+        "Existing entries will keep their notes but lose the chocolate link.",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+            onPress: () => resolve(false),
+          },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: () => resolve(true),
+          },
+        ],
+        {
+          cancelable: true,
+          onDismiss: () => resolve(false),
+        },
+      );
+    });
+
+    if (!shouldDelete) {
+      return;
+    }
+
     await deleteChocolate(params.id);
     router.replace("/(tabs)/library");
   }
@@ -118,4 +147,3 @@ export default function EditChocolateScreen() {
     </ScreenShell>
   );
 }
-

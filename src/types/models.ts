@@ -1,3 +1,4 @@
+// Shared app models live here so storage, screens, and helpers all speak the same shapes.
 export type ActionType = "eat" | "taste" | "purchase" | "no_chocolate";
 
 export type PreferredUnit = "grams" | "bars";

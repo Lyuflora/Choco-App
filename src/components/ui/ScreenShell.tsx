@@ -1,22 +1,27 @@
+// ScreenShell keeps page spacing, headers, and safe-area padding consistent so each screen can stay focused on its own content.
+import type { ReactNode } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { palette, spacing } from "../../ui/theme";
 
 interface ScreenShellProps {
   title: string;
   subtitle: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function ScreenShell({ title, subtitle, children }: ScreenShellProps) {
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <View style={styles.header}>
-        <Text style={styles.kicker}>Dark Diary</Text>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
-      </View>
-      {children}
-    </ScrollView>
+    <SafeAreaView style={styles.screen} edges={["top"]}>
+      <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <View style={styles.header}>
+          <Text style={styles.kicker}>Dark Diary</Text>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>{subtitle}</Text>
+        </View>
+        {children}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -52,4 +57,3 @@ const styles = StyleSheet.create({
     color: palette.textMuted,
   },
 });
-

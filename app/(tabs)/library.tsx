@@ -1,3 +1,4 @@
+// Library stores reusable chocolate details so daily logging stays fast and favorite bars are easy to pick again.
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { EmptyState } from "../../src/components/ui/EmptyState";
@@ -34,7 +35,7 @@ export default function LibraryScreen() {
             <View key={chocolate.id} style={styles.itemBlock}>
               <ListItemCard
                 title={`${chocolate.brand} ${chocolate.productName}`}
-                subtitle={`${chocolate.category} · ${chocolate.originCountry || "Origin unknown"} · ${
+                subtitle={`${chocolate.category} / ${chocolate.originCountry || "Origin unknown"} / ${
                   chocolate.cacaoPercent ?? "?"
                 }% cacao`}
                 meta={chocolate.rating ? `${chocolate.rating}/5` : "Unrated"}
@@ -50,7 +51,7 @@ export default function LibraryScreen() {
                   <Text style={styles.actionText}>{chocolate.favorite ? "Unfavorite" : "Favorite"}</Text>
                 </Pressable>
                 <Pressable style={styles.actionChip} onPress={() => toggleBuyAgain(chocolate.id)}>
-                  <Text style={styles.actionText}>{chocolate.buyAgain ? "Don't rebuy" : "Buy again"}</Text>
+                  <Text style={styles.actionText}>{chocolate.buyAgain ? "Skip rebuy" : "Buy again"}</Text>
                 </Pressable>
               </View>
             </View>
@@ -84,4 +85,3 @@ const styles = StyleSheet.create({
     color: palette.chocolate,
   },
 });
-

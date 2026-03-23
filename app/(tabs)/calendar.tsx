@@ -1,3 +1,4 @@
+// Calendar gives the user a month view of chocolate activity so they can spot patterns without opening each entry first.
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { MonthCalendar } from "../../src/components/calendar/MonthCalendar";
@@ -6,7 +7,7 @@ import { ListItemCard } from "../../src/components/ui/ListItemCard";
 import { ScreenShell } from "../../src/components/ui/ScreenShell";
 import { StatCard } from "../../src/components/ui/StatCard";
 import { useDarkDiary } from "../../src/store/app-provider";
-import { friendlyDate, monthLabel, todayDateKey } from "../../src/utils/date";
+import { friendlyDate, monthLabel, toDateKey, todayDateKey } from "../../src/utils/date";
 import { formatCurrency } from "../../src/utils/format";
 import { buildCalendarCells, chocolateNameById } from "../../src/utils/summary";
 import { palette, radii, spacing } from "../../src/ui/theme";
@@ -21,7 +22,9 @@ export default function CalendarScreen() {
   const selectedSummary = getDateSummary(selectedDate);
 
   function shiftMonth(direction: -1 | 1) {
-    setMonth((current) => new Date(current.getFullYear(), current.getMonth() + direction, 1));
+    const nextMonth = new Date(month.getFullYear(), month.getMonth() + direction, 1);
+    setMonth(nextMonth);
+    setSelectedDate(toDateKey(nextMonth));
   }
 
   if (isHydrating) {
@@ -60,7 +63,7 @@ export default function CalendarScreen() {
         <Text style={styles.detailSubtitle}>
           {selectedSummary.entries.length === 0
             ? "No entries recorded for this day."
-            : `${selectedSummary.entries.length} entries · ${selectedSummary.totalCalories} kcal · ${formatCurrency(
+            : `${selectedSummary.entries.length} entries / ${selectedSummary.totalCalories} kcal / ${formatCurrency(
                 selectedSummary.totalSpend,
                 store.settings,
               )}`}
@@ -71,21 +74,25 @@ export default function CalendarScreen() {
         <EmptyState title="No logs for this date" description="Tap another day or create an entry from the Today tab." />
       ) : (
         <View style={styles.list}>
-          {selectedSummary.entries.map((entry) => (
-            <ListItemCard
-              key={entry.id}
-              title={entry.actionType.replace("_", " ")}
-              subtitle={entry.note || chocolateNameById(store.chocolates, entry.chocolateId)}
-              meta={
-                entry.actionType === "purchase"
-                  ? formatCurrency(entry.spend ?? 0, store.settings)
-                  : `${entry.grams ?? 0} g`
-              }
-              badges={[
-                entry.chocolateId ? chocolateNameById(store.chocolates, entry.chocolateId) : "No chocolate selected",
-              ]}
-            />
-          ))}
+          {selectedSummary.entries.map((entry) => {
+            const chocolateName = entry.chocolateId ? chocolateNameById(store.chocolates, entry.chocolateId) : "";
+
+            return (
+              <ListItemCard
+                key={entry.id}
+                title={entry.actionType.replace("_", " ")}
+                subtitle={entry.note || chocolateName || "Quick entry"}
+                meta={
+                  entry.actionType === "purchase"
+                    ? formatCurrency(entry.spend ?? 0, store.settings)
+                    : entry.actionType === "no_chocolate"
+                      ? "Reset day"
+                      : `${entry.grams ?? 0} g`
+                }
+                badges={chocolateName ? [chocolateName] : []}
+              />
+            );
+          })}
         </View>
       )}
     </ScreenShell>
@@ -142,4 +149,3 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
 });
-

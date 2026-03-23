@@ -1,3 +1,4 @@
+// Insights rolls the current month's entries into a few simple numbers so the user can notice trends without spreadsheet work.
 import { StyleSheet, Text, View } from "react-native";
 import { EmptyState } from "../../src/components/ui/EmptyState";
 import { ScreenShell } from "../../src/components/ui/ScreenShell";
@@ -21,7 +22,7 @@ export default function InsightsScreen() {
   }
 
   return (
-    <ScreenShell title="Insights" subtitle={`Current month · ${monthLabel(anchor)}`}>
+    <ScreenShell title="Insights" subtitle={`Current month / ${monthLabel(anchor)}`}>
       <View style={styles.grid}>
         <StatCard label="Bars Eaten" value={`${summary.totalBars}`} tone="accent" />
         <StatCard label="Grams Consumed" value={`${summary.totalGrams} g`} />
@@ -73,4 +74,3 @@ const styles = StyleSheet.create({
     color: palette.textMuted,
   },
 });
-

@@ -1,3 +1,4 @@
+// New chocolate screen creates reusable library items so repeated logs can be saved with fewer taps later.
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { useState } from "react";
@@ -8,6 +9,7 @@ import { parseOptionalNumber } from "../../src/utils/validation";
 
 function initialValues(): ChocolateFormValues {
   const draft = createEmptyChocolateDraft();
+
   return {
     brand: draft.brand,
     productName: draft.productName,
@@ -66,4 +68,3 @@ export default function NewChocolateScreen() {
     </ScreenShell>
   );
 }
-

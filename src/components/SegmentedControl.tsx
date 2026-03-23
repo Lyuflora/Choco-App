@@ -1,3 +1,4 @@
+// SegmentedControl is the app's small reusable picker for mutually exclusive choices, like action type or units.
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { palette, radii, spacing } from "../ui/theme";
 
