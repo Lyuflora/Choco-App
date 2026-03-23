@@ -1,27 +1,45 @@
 {
   "expo": {
-    "name": "choco",
-    "slug": "choco",
+    "name": "ChocoCare",
+    "slug": "chococare",
+    "scheme": "chococare",
     "version": "1.0.0",
+    "description": "A personal chocolate diary for tracking eating, tasting, purchases, calories, and monthly spending.",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "backgroundColor": "#F6F2EE",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F6F2EE"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.alyu.chococare",
+      "buildNumber": "1",
+      "requireFullScreen": false,
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.alyu.chococare",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#F6F2EE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "extra": {
+      "eas": {}
     },
     "web": {
       "favicon": "./assets/favicon.png"
