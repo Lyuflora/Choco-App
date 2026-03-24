@@ -3,7 +3,7 @@
     "name": "Dark Diary",
     "slug": "dark-diary",
     "scheme": "darkdiary",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": "A personal chocolate diary for tracking eating, tasting, purchases, calories, and monthly spending.",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

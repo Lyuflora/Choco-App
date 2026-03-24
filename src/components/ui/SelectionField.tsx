@@ -16,6 +16,7 @@ interface SelectionFieldProps {
   onOpen: () => void;
   onClose: () => void;
   onSelect: (id: string | null) => void;
+  helperText?: string;
 }
 
 export function SelectionField({
@@ -26,6 +27,7 @@ export function SelectionField({
   onOpen,
   onClose,
   onSelect,
+  helperText,
 }: SelectionFieldProps) {
   return (
     <View style={styles.wrapper}>
@@ -33,6 +35,7 @@ export function SelectionField({
       <Pressable style={styles.trigger} onPress={onOpen}>
         <Text style={styles.triggerText}>{selectedLabel}</Text>
       </Pressable>
+      {helperText ? <Text style={styles.helperText}>{helperText}</Text> : null}
 
       <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
         <Pressable style={styles.overlay} onPress={onClose}>
@@ -76,6 +79,11 @@ const styles = StyleSheet.create({
   triggerText: {
     color: palette.text,
     fontSize: 15,
+  },
+  helperText: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: palette.textMuted,
   },
   overlay: {
     flex: 1,

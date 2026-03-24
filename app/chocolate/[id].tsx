@@ -32,7 +32,7 @@ function emptyValues(): ChocolateFormValues {
 export default function EditChocolateScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ id: string }>();
-  const { getChocolate, saveChocolate, deleteChocolate } = useDarkDiary();
+  const { store, getChocolate, saveChocolate, deleteChocolate } = useDarkDiary();
   const chocolate = getChocolate(params.id);
   const [values, setValues] = useState<ChocolateFormValues>(emptyValues);
 
@@ -143,7 +143,14 @@ export default function EditChocolateScreen() {
 
   return (
     <ScreenShell title="Edit Chocolate" subtitle={`${chocolate.brand} ${chocolate.productName}`}>
-      <ChocolateForm values={values} onChange={updateField} onSave={handleSave} onDelete={handleDelete} saveLabel="Save Changes" />
+      <ChocolateForm
+        values={values}
+        existingChocolates={store.chocolates.filter((item) => item.id !== chocolate.id)}
+        onChange={updateField}
+        onSave={handleSave}
+        onDelete={handleDelete}
+        saveLabel="Save Changes"
+      />
     </ScreenShell>
   );
 }

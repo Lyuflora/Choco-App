@@ -29,7 +29,7 @@ function initialValues(): ChocolateFormValues {
 
 export default function NewChocolateScreen() {
   const router = useRouter();
-  const { saveChocolate } = useDarkDiary();
+  const { store, saveChocolate } = useDarkDiary();
   const [values, setValues] = useState<ChocolateFormValues>(initialValues);
 
   function updateField<K extends keyof ChocolateFormValues>(field: K, value: ChocolateFormValues[K]) {
@@ -64,7 +64,13 @@ export default function NewChocolateScreen() {
 
   return (
     <ScreenShell title="New Chocolate" subtitle="Add a reusable chocolate entry for future logs.">
-      <ChocolateForm values={values} onChange={updateField} onSave={handleSave} saveLabel="Save Chocolate" />
+      <ChocolateForm
+        values={values}
+        existingChocolates={store.chocolates}
+        onChange={updateField}
+        onSave={handleSave}
+        saveLabel="Save Chocolate"
+      />
     </ScreenShell>
   );
 }

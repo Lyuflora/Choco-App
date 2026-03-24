@@ -11,6 +11,8 @@ npm install
 npm run start
 ```
 
+This project uses Expo-aligned native package versions. If you add or update Expo-native dependencies, prefer `npx expo install <package>` over a plain `npm install` so Expo Go and device builds stay compatible.
+
 For web:
 
 ```bash
@@ -28,6 +30,32 @@ For tests:
 ```bash
 npm run test
 ```
+
+## Mobile Device Testing
+
+For the fastest physical-device test loop, use Expo Go:
+
+```bash
+npm run start:lan
+```
+
+- Use `npm run start:lan` when your computer and phone are on the same Wi-Fi network.
+- Use `npm run start:tunnel` if LAN discovery is blocked by your network or VPN.
+- Use `npm run start:tunnel:clear` if Expo Go is stuck on the loading screen and you need a fresh tunnel session.
+- Install Expo Go on each Android or iPhone test device and scan the QR code from the terminal.
+
+If you want installable builds for testers instead of Expo Go sessions:
+
+```bash
+npm run eas:configure
+npm run eas:build:device:android
+npm run eas:build:device:ios
+```
+
+- `eas:build:device:android` creates an internal-distribution Android APK.
+- `eas:build:device:ios` creates an internal-distribution iOS build for registered test devices.
+- `eas:build:development:ios` now targets a physical iPhone or iPad, while `eas:build:simulator:ios` keeps the simulator-only path separate.
+- iOS internal testing still requires your Apple Developer account and device registration during the EAS flow.
 
 ## Architecture
 
@@ -103,6 +131,6 @@ Release configuration is already scaffolded for EAS:
 - app name: `Dark Diary`
 - iOS bundle identifier: `com.alyu.darkdiary`
 - Android package: `com.alyu.darkdiary`
-- EAS profiles: `development`, `preview`, `production`
+- EAS profiles: `development`, `development-simulator`, `preview`, `production`
 
 Store submission still requires your Apple / Google developer accounts, final app store assets, and store listing metadata.

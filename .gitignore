@@ -27,7 +27,10 @@ expo-env.d.ts
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+.gcm-login.*
 expo.log
+expo-mobile.err
+expo-mobile.log
 expo-web.log
 web-headless.log
 

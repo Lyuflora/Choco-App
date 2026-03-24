@@ -8,6 +8,7 @@ interface FormFieldProps {
   placeholder?: string;
   keyboardType?: "default" | "decimal-pad";
   multiline?: boolean;
+  helperText?: string;
 }
 
 export function FormField({
@@ -17,6 +18,7 @@ export function FormField({
   placeholder,
   keyboardType = "default",
   multiline = false,
+  helperText,
 }: FormFieldProps) {
   return (
     <View style={styles.container}>
@@ -31,6 +33,7 @@ export function FormField({
         multiline={multiline}
         textAlignVertical={multiline ? "top" : "center"}
       />
+      {helperText ? <Text style={styles.helperText}>{helperText}</Text> : null}
     </View>
   );
 }
@@ -57,5 +60,9 @@ const styles = StyleSheet.create({
   multiline: {
     minHeight: 96,
   },
+  helperText: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: palette.textMuted,
+  },
 });
-

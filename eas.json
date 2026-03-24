@@ -7,7 +7,10 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
-      },
+      }
+    },
+    "development-simulator": {
+      "distribution": "internal",
       "ios": {
         "simulator": true
       }

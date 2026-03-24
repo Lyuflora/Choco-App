@@ -195,9 +195,9 @@ export function DarkDiaryProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function commit(nextStore: DarkDiaryStore) {
+    await saveStore(nextStore);
     setStore(nextStore);
     storeRef.current = nextStore;
-    await saveStore(nextStore);
   }
 
   async function saveEntry(date: string, draft: EntryDraft) {
